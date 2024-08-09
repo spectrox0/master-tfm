@@ -1,0 +1,91 @@
+[tool.poetry]
+name = "master-tfm"
+version = "0.1.0"
+description = "master-tfm-opsd-time-series"
+authors = ["Your Name <you@example.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [
+{ include = "src" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+pandas = "^2.2.2"
+numpy = "^2.0.1"
+scikit-learn = "^1.5.1"
+matplotlib = "^3.9.1.post1"
+seaborn = "^0.13.2"
+nbdime = "^4.0.1"
+statsmodels = "^0.14.2"
+openpyxl = "^3.1.5"
+ipykernel = "^6.29.5"
+
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.5.6"
+black = "^24.8.0"
+mypy = "^1.11.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+skip-string-normalization = true
+line-length = 120
+
+[tool.ruff]
+# Same as Black.
+line-length = 120
+
+exclude = ["jupyter_notebook_config.py"]
+select = [
+    "E",  # pycodestyle errors (settings from FastAPI, thanks, @tiangolo!)
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "C",  # flake8-comprehensions
+    "B",  # flake8-bugbear
+]
+ignore = [
+    "E501",  # line too long, handled by black
+    "C901",  # too complex
+]
+
+[tool.mypy]
+disallow_untyped_defs = true # Functions need to be annotated
+warn_unused_ignores = true
+ignore_missing_imports = true
+strict = true
+check_untyped_defs = true
+exclude = [
+    "my-project-\\d+", # Ignore temporary folder created by setuptools when building an sdist
+    "venv.*/",
+    "build/",
+    "dist/",
+]
+
+[tool.ruff.per-file-ignores]
+"tests/**" = [
+    "S101", # Use of `assert` detected
+    "D103", # Missing docstring in public function
+]
+"**/__init__.py" = [
+    "F401", # Imported but unused
+    "F403", # Wildcard imports
+]
+"docs/**" = [
+    "INP001",   # Requires __init__.py but docs folder is not a package.
+]
+
+[tool.ruff.lint.pyupgrade]
+# Preserve types, even if a file imports `from __future__ import annotations`(https://github.com/astral-sh/ruff/issues/5434)
+keep-runtime-typing = true
+
+[tool.ruff.isort]
+order-by-type = true
+relative-imports-order = "closest-to-furthest"
+extra-standard-library = ["typing"]
+section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
+known-first-party = []
