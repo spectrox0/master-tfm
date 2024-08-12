@@ -1,49 +1,76 @@
-python -m venv .venv
-source .venv/activate/bin
-python -m pip install poetry
-poetry install
-pip install
+# master-tfm
 
-<!-- // poetry init -->
+`master-tfm` is a project for time series analysis using various Python tools.
 
-pip install ipykernel
+## Requirements
 
-# install jupyter lab
+- Python 3.12
+- [Poetry](https://python-poetry.org/docs/#installation) for dependency management
 
-pip install jupyterlab
+## Installation
 
-# nbdime install with pip
+### Using Poetry
 
-pip install --upgrade nbdime
+1. Clone the repository:
 
-# config git
+    ```bash
+    git clone https://github.com/your-username/master-tfm.git
+    cd master-tfm
+    ```
 
-# default is current project
+2. Install dependencies:
 
-nbdime config-git --enable --global
+    ```bash
+    poetry install
+    ```
 
-# poetry
+3. Activate the virtual environment:
 
-poetry add nbdime
+    ```bash
+    poetry config virtualenvs.in-project true && poetry shell
+    ```
 
-# display execution time of each cell
+4. Generate the `requirements.txt` and `requirements-dev.txt` files:
 
-pip install jupyterlab_execute_time
+    ```bash
+    make generate_requirements_with_poetry
+    ```
 
-# show interactive matplotlib plots
+### Using requirements-dev.txt
 
-pip install ipympl
+1. Clone the repository:
 
-pipenv install jupyterlab-lsp || pip install jupyterlab-lsp
-pipenv install python-lsp-server[all]
-mkdir .lsp_symlink && cd .lsp_symlink && ln -s /home home
+    ```bash
+    git clone https://github.com/your-username/master-tfm.git
+    cd master-tfm
+    ```
 
-# collapsable headings
+2. Create and activate a virtual environment in `.venv`:
 
-pipenv install aquirdturtle_collapsible_headings || pip install aquirdturtle_collapsible_headings
+    ```bash
+    python -m venv .venv
+    source .venv/bin/activate
+    ```
 
-# table of contents
+3. Install the development dependencies:
 
-jupyter labextension install @jupyterlab/toc
+    ```bash
+    pip install -r requirements-dev.txt
+    ```
 
-python -m ipykernel install --user --name poetry_env --display-name "Poetry Environment"
+4. Generate the `requirements.txt` and `requirements-dev.txt` files:
+
+    ```bash
+    make generate_requirements
+    ```
+
+## Usage
+
+After activating the virtual environment and installing all dependencies, you can start working on your project.
+
+## Available Scripts
+
+You can use the following commands to generate the `requirements.txt` files and activate the virtual environment:
+
+```bash
+make generate_requirements
