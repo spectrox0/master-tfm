@@ -21,6 +21,8 @@ statsmodels = "^0.14.2"
 openpyxl = "^3.1.5"
 ipykernel = "^6.29.5"
 
+[tool.poetry.scripts]
+sarimax = "src.notebooks.sarimax_model.sarimax_model:main"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.5.6"
