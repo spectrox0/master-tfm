@@ -1,57 +1,22 @@
-from enum import Enum
-from typing import Type
+"""
+This module contains utility functions for loading datasets.
+"""
+import os
 
 import pandas as pd
 from pandas import DataFrame
 
-
-def file_path(x):
+DEFAULT_FILE_NAME = "time_series_60min_singleindex.csv"
+def load_time_series_60min(file_name=DEFAULT_FILE_NAME) -> DataFrame:
     """
-    Returns the file path for the given time interval.
+    Loads a time series dataset with 60-minute intervals from a CSV file.
 
-    Parameters:
-    x (int): The time interval in minutes.
+    The function constructs the file path relative to the script's directory
+    and reads the CSV file located at '../datasets/time_series_60min_singleindex.csv'.
 
     Returns:
-    str: The file path for the specified time interval.
+        pd.DataFrame: A pandas DataFrame containing the time series data.
     """
-    return f"../../datasets/opsd-time_series-2020-10-06/time_series_{x}min_singleindex.csv"
-
-file_path_15 = file_path(15)
-file_path_30 = file_path(30)
-file_path_60 = file_path(60)
-
-# Define Enum ['15min', '30min', '60min']
-
-class TimeGranularity(str, Enum):
-    """
-    Enumeration class representing different time granularities.
-
-    Attributes:
-        MIN_15 (str): Represents a time granularity of 15 minutes.
-        MIN_30 (str): Represents a time granularity of 30 minutes.
-        MIN_60 (str): Represents a time granularity of 60 minutes.
-    """
-    MIN_15 = '15min'
-    MIN_30 = '30min'
-    MIN_60 = '60min'
-
-dict_file_path = {
-    TimeGranularity.MIN_15: file_path(15),
-    TimeGranularity.MIN_30: file_path_30,
-    TimeGranularity.MIN_60: file_path_60
-}
-
-
-
-def load_dataframe(sheet_name: TimeGranularity = TimeGranularity.MIN_15) -> Type[DataFrame]:
-    """
-    Load a pandas DataFrame from an Excel file.
-
-    Parameters:
-        sheet_name (Type[TimeGranularity]): The name of the sheet to load from the Excel file.
-    Returns:
-        pd.DataFrame: The loaded DataFrame.
-    """
-    df:Type[pd.DataFrame] = pd.read_csv(dict_file_path[sheet_name])
-    return df
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(script_dir, f'../datasets/{file_name}')
+    return pd.read_csv(file_path)

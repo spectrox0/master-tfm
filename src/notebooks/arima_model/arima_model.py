@@ -11,6 +11,8 @@ from statsmodels.tools.sm_exceptions import ConvergenceWarning
 from statsmodels.tsa.arima.model import ARIMA
 from statsmodels.tsa.stattools import adfuller
 
+from src.utils.load_dataframe import load_time_series_60min
+
 
 # Test stationarity using Augmented Dickey-Fuller test
 def test_stationarity(timeseries):
@@ -52,10 +54,8 @@ def arima_scorer(estimator, X_train, y_true):
 def main():
     warnings.filterwarnings("ignore")
 
-    # Load dataset
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    file_path = os.path.join(script_dir, '../Data_processing/processed_data_final.csv')
-    df = pd.read_csv(file_path)
+    df = load_time_series_60min()
+    df.head()
 
     # Convert 'utc_timestamp' to datetime and set as index
     df['utc_timestamp'] = pd.to_datetime(df['utc_timestamp'], utc=True)
