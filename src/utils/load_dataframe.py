@@ -1,12 +1,25 @@
 from enum import Enum
-from typing import List, Type
+from typing import Type
 
 import pandas as pd
 from pandas import DataFrame
 
-file_path_15 = '../../datasets/opsd-time_series-2020-10-06/time_series_15min_singleindex.csv'
-file_path_30 = '../../datasets/opsd-time_series-2020-10-06/time_series_30min_singleindex.csv'
-file_path_60 = '../../datasets/opsd-time_series-2020-10-06/time_series_60min_singleindex.csv'
+
+def file_path(x):
+    """
+    Returns the file path for the given time interval.
+
+    Parameters:
+    x (int): The time interval in minutes.
+
+    Returns:
+    str: The file path for the specified time interval.
+    """
+    return f"../../datasets/opsd-time_series-2020-10-06/time_series_{x}min_singleindex.csv"
+
+file_path_15 = file_path(15)
+file_path_30 = file_path(30)
+file_path_60 = file_path(60)
 
 # Define Enum ['15min', '30min', '60min']
 
@@ -24,7 +37,7 @@ class TimeGranularity(str, Enum):
     MIN_60 = '60min'
 
 dict_file_path = {
-    TimeGranularity.MIN_15: file_path_15,
+    TimeGranularity.MIN_15: file_path(15),
     TimeGranularity.MIN_30: file_path_30,
     TimeGranularity.MIN_60: file_path_60
 }
