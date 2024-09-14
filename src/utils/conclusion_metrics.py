@@ -67,6 +67,7 @@ def calculate_all_metrics(y_true:MatrixLike | ArrayLike, y_pred:MatrixLike | Arr
     mae = mean_absolute_error(y_true, y_pred)
     r2 = r2_score(y_true, y_pred)
     mape = mean_absolute_percentage_error(y_true, y_pred)
+    accuracy = custom_accuracy(y_true, y_pred)
 
 
     print(f"MSE: {mse}")
@@ -74,4 +75,5 @@ def calculate_all_metrics(y_true:MatrixLike | ArrayLike, y_pred:MatrixLike | Arr
     print(f"MAE: {mae}")
     print(f"R2: {r2}")
     print(f"MAPE: {mape}%")
-    return mse, rmse, mae, r2, mape
+    print(f"Accuracy: {accuracy}% with a tolerance of 5%")
+    return mse, rmse, mae, r2, mape , accuracy
