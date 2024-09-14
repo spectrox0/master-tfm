@@ -1,8 +1,32 @@
-# master-tfm
+# 📊 Master TFM: Advanced Time Series Analysis Project 🚀
 
-`master-tfm` is a project for time series analysis using various Python tools.
+Welcome to the Master TFM project! This project focuses on analyzing time series data using state-of-the-art machine learning and deep learning models. With this analysis, we aim to extract valuable insights from complex datasets, specifically focusing on energy consumption trends and patterns. Our project covers a wide array of models, such as CNN, LSTM, XGBoost, and SARIMAX.
 
-## Requirements
+## 📑 Dataset
+
+The primary dataset we’re working with is the Open Power System Data. You can access the full dataset used in this analysis here. This dataset includes 60-minute interval time series data for power system usage across different regions.
+
+The data is processed and analyzed using powerful Python libraries such as:
+
+• `pandas` for data manipulation
+• `scikit-learn` for machine learning models
+• `TensorFlow` and `Keras` for deep learning (CNN, LSTM)
+• `XGBoost` for gradient boosting models
+• `SARIMAX` for statistical time series forecasting
+• `numpy` for numerical computations
+• `matplotlib` and seaborn for data visualization
+
+## 🚀 Objectives
+
+•Implement multiple machine learning and deep learning models to analyze the time series dataset.
+• Explore patterns and trends in energy consumption.
+• Compare the performance of different models and optimize them for better accuracy.
+
+## 🛠️ Project Setup
+
+### Requirements
+
+Follow the steps below to install and set up the project.
 
 - Python 3.11
 - [Poetry](https://python-poetry.org/docs/#installation) for dependency management
