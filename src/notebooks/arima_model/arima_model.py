@@ -104,7 +104,6 @@ def main():
     # Show the best parameters
     print(f"Best parameters: {best_params}")
     print(f"Best model AIC: {best_aic}")
-    
     # 6. Evaluate the model on the test set
     predictions = best_model.predict(start=test_y.index[0], end=test_y.index[-1], exog=test_X)
 
