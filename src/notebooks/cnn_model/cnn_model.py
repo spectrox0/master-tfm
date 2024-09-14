@@ -16,8 +16,6 @@ from src.utils.load_dataframe import load_time_series_60min
 
 
 def main():
-    tf.config.experimental.set_memory_growth(tf.config.experimental.list_physical_devices('GPU')[0], True)
-
     print(device_lib.list_local_devices())
     if tf.test.gpu_device_name():
         print('Default GPU Device: {}'.format(tf.test.gpu_device_name()))

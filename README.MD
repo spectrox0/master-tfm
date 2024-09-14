@@ -4,7 +4,7 @@
 
 ## Requirements
 
-- Python 3.12
+- Python 3.11
 - [Poetry](https://python-poetry.org/docs/#installation) for dependency management
 - `Make` (Makefile) for running project scripts
 
@@ -16,23 +16,25 @@
 
 Make is typically pre-installed on macOS. If it's missing, you can install it via Xcode Command Line Tools:
 
-````bash
+```bash
     xcode-select --install
-    ### Using Poetry
+```
 
 Alternatively, you can use Homebrew:
 
 ```bash
-brew install make
+   brew install make
+```
 
-
-Linux
+#### Linux
 
 Most Linux distributions come with Make pre-installed. If it's missing, you can install it using your package manager. For example, on Ubuntu:
 
+```bash
 sudo apt-get install build-essential
+```
 
-Windows
+#### Windows
 
 To use Make on Windows, you can install it via Chocolatey or use a Windows Subsystem for Linux (WSL):
 
@@ -44,26 +46,27 @@ Using Chocolatey:
 
     bash
 
+```powershell
 choco install make
+```
 
 Using WSL:
 
     Install WSL: https://docs.microsoft.com/en-us/windows/wsl/install
     Use the Linux instructions above once WSL is installed.
 
-
 1. Clone the repository:
 
-    ```bash
-    git clone https://github.com/your-username/master-tfm.git
-    cd master-tfm
-    ```
+   ```bash
+   git clone https://github.com/your-username/master-tfm.git
+   cd master-tfm
+   ```
 
 2. Install dependencies:
 
-```bash
-poetry install
-```
+   ```bash
+   poetry install
+   ```
 
 3. Activate the virtual environment:
 
@@ -116,4 +119,28 @@ You can use the following commands to generate the `requirements.txt` files and 
 ```bash
 make generate_requirements
 ```
-````
+
+## Downloading Data with initialize.py
+
+To download the necessary data for this project, you need to run the initialize.py script, which is set up to download data automatically. Depending on your environment, you can do it in several ways:
+
+```bash
+poetry run download-data
+```
+
+On Linux/macOS (using a shell script):
+
+```bash
+./initialize.py
+```
+
+On Windows:
+With PowerShell:
+
+```powershell
+./initialize.ps1
+```
+
+```cmd
+initialize.cmd
+```

@@ -24,10 +24,12 @@ pmdarima = "^2.0.4"
 cython = "^3.0.11"
 tensorflow = "2.16.2"
 tensorflow-metal = "^1.1.0"
+requests = "^2.32.3"
 
 [tool.poetry.scripts]
 arima = "src.notebooks.arima_model.arima_model:main"
 cnn = "src.notebooks.cnn_model.cnn_model:main"
+download-data = "initialize:main"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.5.6"

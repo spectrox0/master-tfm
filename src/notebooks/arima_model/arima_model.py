@@ -1,5 +1,4 @@
 # %%
-import warnings
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -7,10 +6,11 @@ import pandas as pd
 import pmdarima as pm
 import scipy.stats as stats
 import statsmodels.api as sm
-from pmdarima.arima.utils import ndiffs, nsdiffs
 from scipy.stats import boxcox
+from sklearn.discriminant_analysis import StandardScaler
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+from statsmodels.tsa.statespace.sarimax import SARIMAX
 from statsmodels.tsa.stattools import adfuller
 
 from src.utils.load_dataframe import load_time_series_60min
@@ -23,142 +23,114 @@ def inv_boxcox(y, lam):
 def main():
     # Load the CSV
     df = load_time_series_60min()
-
-    # Convert 'utc_timestamp' to datetime and set as index
-    df['utc_timestamp'] = pd.to_datetime(df['utc_timestamp'], utc=True)
+    df['utc_timestamp'] = pd.to_datetime(df['utc_timestamp'])
     df.set_index('utc_timestamp', inplace=True)
 
-    # Select relevant column and interpolate missing values
-    target_variable = 'DE_load_actual_entsoe_transparency'
-    df[target_variable] = df[target_variable].interpolate(method='time')
+    exogenous_variables = [
+        'DE_solar_generation_actual',    # Solar generation for Germany
+        'DE_wind_onshore_generation_actual',  # Wind generation for Germany
+        'FR_load_actual_entsoe_transparency',  # Load from France
+        'NL_load_actual_entsoe_transparency',  # Load from Netherlands
+        'AT_price_day_ahead'  # Price day ahead for Austria (as a proxy for price)
+    ]
 
-    # Use last two years of data for faster computation
-    series = df[target_variable].dropna().asfreq('h').last('2Y')
+    # Select the target variable and the exogenous variables, dropping rows with missing values
+    df = df[['DE_load_actual_entsoe_transparency'] + exogenous_variables].dropna()
 
-    # Split into training and test sets (80% train, 20% test)
-    train_size = int(len(series) * 0.8)
-    train_data, test_data = series.iloc[:train_size], series.iloc[train_size:]
+    # Define the target variable and exogenous variables
+    y = df['DE_load_actual_entsoe_transparency']
+    X = df[exogenous_variables]
 
-    # Apply Box-Cox transformation to stabilize variance
-    train_data_transformed_values, lam = boxcox(train_data)
+    # 2. Check for stationarity with ADF test and apply Box-Cox if necessary
+    adf_result = adfuller(y)
+    print(f"ADF Statistic: {adf_result[0]}")
+    print(f"p-value: {adf_result[1]}")
+    if adf_result[1] > 0.05:
+        print("The series is non-stationary, applying Box-Cox transformation...")
+        y_transformed, lam = boxcox(y)  # Apply Box-Cox transformation
+    else:
+        y_transformed = y  # No transformation needed
 
-    # Convert transformed data back to pandas Series
-    train_data_transformed = pd.Series(train_data_transformed_values, index=train_data.index)
-
-    # Determine differencing orders
-    d = ndiffs(train_data_transformed, test='adf')
-    D = nsdiffs(train_data_transformed, m=168, test='ocsb')
-    print(f'Optimal d: {d}, Optimal D: {D}')
-
-    # Plot ACF and PACF for transformed series
-    plt.figure(figsize=(10, 5))
-    plot_acf(train_data_transformed.diff().dropna(), lags=20)
+    # Visualize ACF and PACF for the target variable
+    plt.figure(figsize=(10, 6))
+    plot_acf(y_transformed, lags=40)
     plt.show()
 
-    plt.figure(figsize=(10, 5))
-    plot_pacf(train_data_transformed.diff().dropna(), lags=20)
+    plt.figure(figsize=(10, 6))
+    plot_pacf(y_transformed, lags=40)
     plt.show()
 
+    # 3. Scaling (optional): Scale the exogenous variables if necessary
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)  # Only scaling the exogenous variables
 
-  # Use auto_arima with further reduced parameters
-    stepwise_model = pm.auto_arima(
-    train_data_transformed,
-    start_p=0, max_p=1,    # Reduced from 2 to 1
-    start_q=0, max_q=1,    # Reduced from 2 to 1
-    start_P=0, max_P=1,    # Reduced from 1 to 0 (no seasonal AR terms)
-    start_Q=0, max_Q=1,    # Reduced from 1 to 0 (no seasonal MA terms)
-    d=d,
-    D=D,
-    m=168,  # Weekly seasonality
-    seasonal=True,
-    trace=False,
-    error_action='ignore',
-    suppress_warnings=True,
-    stepwise=True,
-    max_order=4,   # Further limit model complexity
-    maxiter=20,    # Reduce iterations for faster computation
-    n_jobs=1
-)
+    # Split the data into training and testing sets (80% training, 20% testing)
+    train_size = int(len(df) * 0.8)
+    train_y, test_y = y_transformed[:train_size], y_transformed[train_size:]
+    train_X, test_X = X_scaled[:train_size], X_scaled[train_size:]
 
-    # Forecast
-    n_periods = len(test_data)
-    fc_transformed, confint = stepwise_model.predict(n_periods=n_periods, return_conf_int=True)
+    # 4. Define the range of hyperparameters to optimize
+    p = q = range(0, 3)  # AR and MA parameters
+    d = range(0, 2)  # Differentiation
 
-    # Inverse Box-Cox transformation
-    fc = inv_boxcox(fc_transformed, lam)
-    lower_series = inv_boxcox(confint[:, 0], lam)
-    upper_series = inv_boxcox(confint[:, 1], lam)
-    fc_series = pd.Series(fc, index=test_data.index)
+   # Seasonal parameters (for yearly seasonality)
+    P = Q = range(0, 3)
+    D = range(0, 2)
+    S = [24]  # Daily seasonality (24 hours)
 
-    # Calculate error metrics
-    mse = mean_squared_error(test_data, fc)
-    rmse = np.sqrt(mse)
-    mae = mean_absolute_error(test_data, fc)
-    mape = np.mean(np.abs((test_data - fc) / test_data)) * 100
-    smape = 100/len(test_data) * np.sum(2 * np.abs(fc - test_data) / (np.abs(test_data) + np.abs(fc)))
-    r2 = r2_score(test_data, fc)
-    print(f'Mean Squared Error (MSE): {mse:.2f}')
-    print(f'Root Mean Squared Error (RMSE): {rmse:.2f}')
-    print(f'Mean Absolute Error (MAE): {mae:.2f}')
-    print(f'Mean Absolute Percentage Error (MAPE): {mape:.2f}%')
-    print(f'Symmetric MAPE (sMAPE): {smape:.2f}%')
-    print(f'R-squared: {r2:.4f}')
+    # Generate combinations of parameters
+    param_grid = [
+        ((p1, d1, q1), (P1, D1, Q1, S1))
+        for p1 in p for d1 in d for q1 in q
+        for P1 in P for D1 in D for Q1 in Q for S1 in S
+    ]
 
-    # Plot the forecast vs actuals
-    plt.figure(figsize=(14, 7))
-    plt.plot(train_data[-168:], label='Training Data (last week)')
-    plt.plot(test_data, label='Actual')
-    plt.plot(fc_series, label='Forecast')
-    plt.fill_between(test_data.index, lower_series, upper_series, color='k', alpha=0.15)
-    plt.title('Forecast vs Actuals')
-    plt.xlabel('Time')
-    plt.ylabel(target_variable)
-    plt.legend(loc='upper left')
+    # 5. Train the model with simple grid search and TimeSeriesSplit
+    best_aic = np.inf
+    best_params = None
+    best_model = None
+
+    for param in param_grid:
+        try:
+            model = SARIMAX(train_y, exog=train_X, order=param[0], seasonal_order=param[1])
+            result = model.fit(disp=False)
+            if result.aic < best_aic:
+                best_aic = result.aic
+                best_params = param
+                best_model = result
+        except:
+            continue
+
+    # Show the best parameters
+    print(f"Best parameters: {best_params}")
+    print(f"Best model AIC: {best_aic}")
+    
+    # 6. Evaluate the model on the test set
+    predictions = best_model.predict(start=test_y.index[0], end=test_y.index[-1], exog=test_X)
+
+    # Reverse Box-Cox transformation if applied
+    if 'lam' in locals():
+        predictions = np.exp(np.log(predictions * lam + 1) / lam)  # Reverse transformation
+        test_y = np.exp(np.log(test_y * lam + 1) / lam)
+
+    # 7. Calculate metrics: RMSE, MAE, R2
+    rmse = np.sqrt(mean_squared_error(test_y, predictions))
+    mae = mean_absolute_error(test_y, predictions)
+    r2 = r2_score(test_y, predictions)
+    print(f"RMSE: {rmse}")
+    print(f"MAE: {mae}")
+    print(f"R²: {r2}")
+
+    # 8. Plot the results
+    plt.figure(figsize=(10, 6))
+    plt.plot(test_y, label='Actual')
+    plt.plot(predictions, label='Prediction', linestyle='--')
+    plt.title('Prediction vs Actual - SARIMAX Model')
+    plt.xlabel('Date')
+    plt.ylabel('Load (MW)')
+    plt.legend()
+    plt.grid(True)
     plt.show()
-
-    # Residual analysis
-    residuals = test_data - fc_series
-
-    # Plot residuals over time
-    plt.figure(figsize=(14, 7))
-    plt.plot(residuals)
-    plt.title('Residuals over Time')
-    plt.xlabel('Time')
-    plt.ylabel('Residuals')
-    plt.show()
-
-    # Histogram of residuals
-    plt.figure(figsize=(8, 6))
-    plt.hist(residuals, bins=50, density=True, alpha=0.6, color='g')
-
-    # Plot the normal distribution fit
-    mu, std = stats.norm.fit(residuals)
-    xmin, xmax = plt.xlim()
-    x = np.linspace(xmin, xmax, 100)
-    p = stats.norm.pdf(x, mu, std)
-    plt.plot(x, p, 'k', linewidth=2)
-    plt.title('Histogram of Residuals')
-    plt.xlabel('Residuals')
-    plt.ylabel('Density')
-    plt.show()
-
-    # QQ-plot of residuals
-    sm.qqplot(residuals, line='s')
-    plt.title('QQ Plot of Residuals')
-    plt.show()
-
-    # ACF and PACF plots of residuals
-    fig, axes = plt.subplots(1, 2, figsize=(16, 4))
-    plot_acf(residuals, lags=30, ax=axes[0])
-    plot_pacf(residuals, lags=30, ax=axes[1])
-    axes[0].set_title('ACF of Residuals')
-    axes[1].set_title('PACF of Residuals')
-    plt.show()
-
-    # Ljung-Box test
-    lb_test = sm.stats.acorr_ljungbox(residuals, lags=[10], return_df=True)
-    print('Ljung-Box test:')
-    print(lb_test)
 
 
 if __name__ == "__main__":

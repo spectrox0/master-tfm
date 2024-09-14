@@ -19,4 +19,5 @@ def load_time_series_60min(file_name=DEFAULT_FILE_NAME) -> DataFrame:
     """
     script_dir = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.join(script_dir, f'../datasets/{file_name}')
-    return pd.read_csv(file_path)
+    return pd.read_csv(file_path, parse_dates=['utc_timestamp'], index_col='utc_timestamp')
+    # return pd.read_csv(file_path)
