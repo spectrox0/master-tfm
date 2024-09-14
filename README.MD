@@ -1,4 +1,4 @@
-# 📊 Master TFM: Advanced Time Series Analysis Project 🚀
+# 📊 Master TFM: Advanced Time Series Analysis Project
 
 Welcome to the Master TFM project! This project focuses on analyzing time series data using state-of-the-art machine learning and deep learning models. With this analysis, we aim to extract valuable insights from complex datasets, specifically focusing on energy consumption trends and patterns. Our project covers a wide array of models, such as CNN, LSTM, XGBoost, and SARIMAX.
 
