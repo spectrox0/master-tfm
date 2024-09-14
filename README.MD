@@ -17,13 +17,13 @@
 Make is typically pre-installed on macOS. If it's missing, you can install it via Xcode Command Line Tools:
 
 ```bash
-    xcode-select --install
+xcode-select --install
 ```
 
 Alternatively, you can use Homebrew:
 
 ```bash
-   brew install make
+brew install make
 ```
 
 #### Linux
@@ -40,11 +40,11 @@ To use Make on Windows, you can install it via Chocolatey or use a Windows Subsy
 
 Using Chocolatey:
 
-    Install Chocolatey if you haven't already: https://chocolatey.org/install
+Install Chocolatey if you haven't already: https://chocolatey.org/install
 
-    Install Make:
+Install Make:
 
-    bash
+bash
 
 ```powershell
 choco install make
@@ -52,8 +52,8 @@ choco install make
 
 Using WSL:
 
-    Install WSL: https://docs.microsoft.com/en-us/windows/wsl/install
-    Use the Linux instructions above once WSL is installed.
+Install WSL: https://docs.microsoft.com/en-us/windows/wsl/install
+Use the Linux instructions above once WSL is installed.
 
 1. Clone the repository:
 
