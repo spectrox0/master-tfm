@@ -24,11 +24,11 @@ The data is processed and analyzed using powerful Python libraries such as:
 
 ## 🛠️ Project Setup
 
-### Requirements
-
 Follow the steps below to install and set up the project.
 
-- Python 3.11
+### Requirements
+
+- `Python 3.11`
 - [Poetry](https://python-poetry.org/docs/#installation) for dependency management
 - `Make` (Makefile) for running project scripts
 
@@ -144,9 +144,11 @@ You can use the following commands to generate the `requirements.txt` files and 
 make generate_requirements
 ```
 
-## Downloading Data with initialize.py
+## 📊 Model Training and Data Analysis
 
-To download the necessary data for this project, you need to run the initialize.py script, which is set up to download data automatically. Depending on your environment, you can do it in several ways:
+To download the dataset and initialize the project for analysis:
+
+You need to run the initialize.py script, which is set up to download data automatically. Depending on your environment, you can do it in several ways:
 
 ```bash
 poetry run download-data
@@ -168,3 +170,9 @@ With PowerShell:
 ```cmd
 initialize.cmd
 ```
+
+🎯 Conclusion
+
+With this project, we aim to demonstrate the power of advanced machine learning and deep learning models applied to real-world time series data. From statistical models like SARIMAX to cutting-edge deep learning architectures such as CNN and LSTM, this project serves as a comprehensive toolkit for time series forecasting and analysis.
+
+Let me know if you want to tweak anything or add additional details!
