@@ -2,7 +2,7 @@
 name = "master-tfm"
 version = "0.1.0"
 description = "master-tfm-opsd-time-series"
-authors = ["Your Name <you@example.com>"]
+authors = ["Alejandro Velazco <alejanvelazco2008@proton.me>"]
 license = "MIT"
 readme = "README.md"
 packages = [
