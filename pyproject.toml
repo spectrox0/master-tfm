@@ -27,8 +27,8 @@ tensorflow-metal = "^1.1.0"
 requests = "^2.32.3"
 
 [tool.poetry.scripts]
-arima = "src.notebooks.arima_model.arima_model:main"
-cnn = "src.notebooks.cnn_model.cnn_model:main"
+# arima = "src.notebooks.arima_model.arima_model:main"
+# cnn = "src.notebooks.cnn_model.cnn_model:main"
 download-data = "initialize:main"
 
 [tool.poetry.group.dev.dependencies]
