@@ -1,5 +1,6 @@
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
+import seaborn as sns
 from numpy import ndarray
 from pandas import DataFrame, DatetimeIndex
 
@@ -143,3 +144,15 @@ def plot_residuals(test_dates: DatetimeIndex, residuals: ndarray) -> None:
 
     plt.xticks(rotation=45)
     plt.tight_layout()
+
+
+def plot_correlation_matrix(correlation_matrix: DataFrame) -> None:
+    """
+    Plot the correlation matrix of the given DataFrame.
+    Parameters:
+    df (pd.DataFrame): The DataFrame for which to plot the correlation matrix.
+    """
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(correlation_matrix, annot=True, fmt='.2f', cmap='coolwarm', cbar=True, square=True)
+    plt.title('Correlation Matrix')
+    plt.show()
